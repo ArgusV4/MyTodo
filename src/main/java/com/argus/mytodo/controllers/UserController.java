@@ -1,5 +1,7 @@
 package com.argus.mytodo.controllers;
 
+import com.argus.mytodo.entities.Client;
+import com.argus.mytodo.entities.dtos.ClientDto;
 import com.argus.mytodo.jwt.AuthRequest;
 import com.argus.mytodo.entities.User;
 import com.argus.mytodo.entities.dtos.UserDto;
@@ -10,6 +12,7 @@ import com.argus.mytodo.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.argus.mytodo.jwt.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +54,13 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@RequestParam("subject") String subject, @RequestParam(value = "file", required=false) MultipartFile file) throws JsonProcessingException {
         UserDto request = new ObjectMapper().readValue(subject, UserDto.class);
         User response = this.userService.createUser(request, file);
+        return ResponseEntity.ok(this.userMapper.mapToRest(response));
+    }
+    @PostMapping("/createClientByAdmin")
+    public ResponseEntity<ClientDto> createClientByAdmin(@RequestParam("subject") String subject, @RequestParam(value = "file", required=false) MultipartFile file, HttpServletRequest requestHeader) throws JsonProcessingException {
+        String token = requestHeader.getHeader("Authorization").substring(7);
+        ClientDto request = new ObjectMapper().readValue(subject, ClientDto.class);
+        Client response = this.userService.createClientByAdmin(request, file, token);
         return ResponseEntity.ok(this.userMapper.mapToRest(response));
     }
     @PutMapping("/user/{id}")

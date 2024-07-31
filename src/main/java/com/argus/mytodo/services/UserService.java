@@ -5,6 +5,7 @@ import com.argus.mytodo.entities.Admin;
 import com.argus.mytodo.entities.Client;
 import com.argus.mytodo.entities.SuperAdmin;
 import com.argus.mytodo.entities.User;
+import com.argus.mytodo.entities.dtos.ClientDto;
 import com.argus.mytodo.entities.dtos.UserDto;
 import com.argus.mytodo.entities.mappers.UserMapper;
 import com.argus.mytodo.exceptionhandler.AlreadyExistsExeption;
@@ -78,15 +79,38 @@ public class UserService {
             throw new NotFoundException("user", id);
         return userDto;
     }
+    public Client createClientByAdmin(ClientDto clientDto, MultipartFile file, String token) {
+        userRepository.findByEmail(clientDto.getEmail()).ifPresent(value -> {
+            throw new AlreadyExistsExeption("email", value.getEmail());
+        });
+        User admin = this.jwtService.extractUserFromToken(token).get();
+        clientDto.setUuidAdmin(admin.getUuid());
+        if ((file != null)) {
+            clientDto.setPicture(file.getOriginalFilename());
+        } else {
+            clientDto.setPicture(null);
+        }
+        Client client = this.userMapper.mapFromRest(clientDto);
+        client.setPassword(passwordEncoder.encode(client.getPassword()));
+        if(file != null) {
+            client.setPicture(this.storageService.save(file));
+        }
+        this.clientRepository.save(client);
+        return client;
+    }
 
     public User createUser(UserDto userDto, MultipartFile file){
         userRepository.findByEmail(userDto.getEmail()).ifPresent(value -> {
             throw new AlreadyExistsExeption("email", value.getEmail());
         });
-        if(file != null) userDto.setPicture(file.getOriginalFilename());
+        if ((file != null)) {
+            userDto.setPicture(file.getOriginalFilename());
+        } else {
+            userDto.setPicture(null);
+        }
         User user = this.userMapper.mapFromRest(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setPicture(this.storageService.save(file));
+        if(file != null) user.setPicture(this.storageService.save(file));
         switch (user.getRole()){
             case SUPERADMIN : {
                 SuperAdmin superAdmin = this.userMapper.userToSuperadmin(user);
