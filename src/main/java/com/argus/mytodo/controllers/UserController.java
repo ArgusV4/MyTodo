@@ -30,15 +30,11 @@ public class UserController {
     private final UserService userService;
     private final FilesStorageService storageService;
     private final UserMapper userMapper;
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
 
-    public UserController(UserService userService, FilesStorageService storageService, UserMapper userMapper, AuthenticationManager authenticationManager, JwtService jwtService) {
+    public UserController(UserService userService, FilesStorageService storageService, UserMapper userMapper) {
         this.userService = userService;
         this.storageService = storageService;
         this.userMapper = userMapper;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
     }
 
     @GetMapping("/all-users")
@@ -75,15 +71,9 @@ public class UserController {
 
     @PostMapping("/generateToken")
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-        );
-        if (authentication.isAuthenticated()) {
-            String token = jwtService.generateToken(authRequest.getEmail());
-            return new AuthResponse(token,jwtService.extractExpiration(token));
-        } else {
-            throw new UsernameNotFoundException("Invalid user request!");
-        }
+        return this.userService.generateToken(authRequest);
+
+
     }
 
     @GetMapping("/principal")

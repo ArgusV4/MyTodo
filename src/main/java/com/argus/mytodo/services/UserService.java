@@ -9,6 +9,9 @@ import com.argus.mytodo.entities.dtos.UserDto;
 import com.argus.mytodo.entities.mappers.UserMapper;
 import com.argus.mytodo.exceptionhandler.AlreadyExistsExeption;
 import com.argus.mytodo.exceptionhandler.NotFoundException;
+import com.argus.mytodo.jwt.AuthRequest;
+import com.argus.mytodo.jwt.AuthResponse;
+import com.argus.mytodo.jwt.JwtService;
 import com.argus.mytodo.repositories.AdminRepository;
 import com.argus.mytodo.repositories.ClientRepository;
 import com.argus.mytodo.repositories.SuperadminRepository;
@@ -16,6 +19,10 @@ import com.argus.mytodo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,8 +43,12 @@ public class UserService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate) {
+
+
+    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate,AuthenticationManager authenticationManager , JwtService jwtService ) {
         this.storageService = storageService;
         this.userMapper = userMapper;
         this.userRepository = userRepository;
@@ -46,6 +57,10 @@ public class UserService {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
         this.jdbcTemplate = jdbcTemplate;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+
+
     }
 
     public List<UserDto> getAllUsers(){
@@ -119,6 +134,18 @@ public class UserService {
         }
         this.userRepository.deleteById(id);
     }
+    public AuthResponse generateToken(AuthRequest authRequest ) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+        );
+        if (authentication.isAuthenticated()) {
+            String token = jwtService.generateToken(authRequest.getEmail());
+            return new AuthResponse(token,jwtService.extractExpiration(token));
+        } else {
+            throw new UsernameNotFoundException("Invalid user request!");
+        }
+    }
+
 
     public void createSuperAdminIfNotExists() {
         String rawPassword = "system1199";
@@ -134,5 +161,4 @@ public class UserService {
         jdbcTemplate.update(userSQL, encodedPassword);
         jdbcTemplate.update(superAdminSQL);
     }
-
 }
