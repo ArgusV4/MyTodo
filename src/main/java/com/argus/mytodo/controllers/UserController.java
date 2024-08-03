@@ -82,8 +82,6 @@ public class UserController {
     @PostMapping("/generateToken")
     public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         return this.userService.generateToken(authRequest);
-
-
     }
 
     @GetMapping("/principal")

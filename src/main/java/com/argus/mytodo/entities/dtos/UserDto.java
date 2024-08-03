@@ -2,12 +2,13 @@ package com.argus.mytodo.entities.dtos;
 
 
 import com.argus.mytodo.Enums.RoleENUM;
+import com.argus.mytodo.entities.BaseEntity;
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class UserDto {
+public class UserDto extends BaseEntity {
     private Long id;
     private UUID uuid;
     private String firstname;
