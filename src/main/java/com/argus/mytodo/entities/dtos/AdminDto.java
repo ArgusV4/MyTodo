@@ -13,10 +13,8 @@ public class AdminDto {
     private UUID uuid;
     private String firstname;
     private String lastname;
-    private String password;
     private String email;
     private String picture;
     private RoleENUM role;
-    private List<Todo> todos;
 
 }

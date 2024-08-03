@@ -10,10 +10,9 @@ import java.util.UUID;
 @Data
 @Table(name = "todo", schema = "mytodo")
 public class Todo extends BaseEntity{
-    private UUID uuid;
     private String description;
     private Date targetDate;
-    private boolean isCompleted;
+    private boolean isCompleted = false;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
     private Admin admin;
