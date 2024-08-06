@@ -82,4 +82,5 @@ public class JwtService {
         String email = extractUsername(token);
         return this.userRepository.findByEmail(email);
     }
+
 }

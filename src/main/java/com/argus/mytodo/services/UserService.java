@@ -9,6 +9,7 @@ import com.argus.mytodo.entities.dtos.ClientDto;
 import com.argus.mytodo.entities.dtos.UserDto;
 import com.argus.mytodo.entities.mappers.UserMapper;
 import com.argus.mytodo.exceptionhandler.AlreadyExistsExeption;
+import com.argus.mytodo.exceptionhandler.NotAuthorized;
 import com.argus.mytodo.exceptionhandler.NotFoundException;
 import com.argus.mytodo.jwt.AuthRequest;
 import com.argus.mytodo.jwt.AuthResponse;
@@ -123,9 +124,7 @@ public class UserService {
                 return admin;
             }
             case CLIENT : {
-                Client client = this.userMapper.userToClient(user);
-                this.clientRepository.save(client);
-                return client;
+                throw new NotAuthorized("Clients could be created only by admins");
             }
         }
         return user;

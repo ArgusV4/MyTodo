@@ -4,6 +4,10 @@ import com.argus.mytodo.entities.Todo;
 import com.argus.mytodo.entities.dtos.TodoDtoForGet;
 import com.argus.mytodo.entities.dtos.TodoDtoForPost;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class TodoMapper {
 
@@ -32,7 +36,6 @@ public class TodoMapper {
         todoDto.setDescription(todo.getDescription());
         todoDto.setTargetDate(todo.getTargetDate());
         todoDto.setCompleted(todo.isCompleted());
-        todoDto.setAdminId(todo.getAdmin().getId());
         todoDto.setClientId(todo.getClient().getId());
         return todoDto;
     }
@@ -50,6 +53,23 @@ public class TodoMapper {
         todoDto.setClient(this.userMapper.mapToRest(todo.getClient()));
 
         return todoDto;
+    }
+    public List<TodoDtoForGet> mapToRestForGet(List<Todo> todos) {
+        List<TodoDtoForGet> todosDto = new ArrayList<>();
+        for(Todo todo : todos){
+            TodoDtoForGet todoDto = new TodoDtoForGet();
+            todoDto.setId(todo.getId());
+            todoDto.setUuid(todo.getUuid());
+            todoDto.setCreationDate(todo.getCreationDate());
+            todoDto.setLastUpdate(todo.getLastUpdate());
+            todoDto.setDescription(todo.getDescription());
+            todoDto.setTargetDate(todo.getTargetDate());
+            todoDto.setCompleted(todo.isCompleted());
+            todoDto.setAdmin(this.userMapper.mapToRest(todo.getAdmin()));
+            todoDto.setClient(this.userMapper.mapToRest(todo.getClient()));
+            todosDto.add(todoDto);
+        }
+        return todosDto ;
     }
 
 }

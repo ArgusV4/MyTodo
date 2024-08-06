@@ -10,6 +10,5 @@ public class TodoDtoForPost extends BaseEntity {
     private String description ;
     private boolean isCompleted;
     private Date targetDate;
-    private Long adminId;
     private Long clientId;
 }

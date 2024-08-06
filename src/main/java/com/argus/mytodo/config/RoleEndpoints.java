@@ -12,7 +12,8 @@ public class RoleEndpoints {
 
     public static final List<String> ADMIN_ENDPOINTS = List.of(
             "/users/createClientByAdmin",
-            "/todos/create"
+            "/todos/create",
+            "/todos/getTodoByAdmin"
             // Add other ADMIN endpoints here
     );
 
