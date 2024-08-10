@@ -100,38 +100,39 @@ public class UserService {
         return client;
     }
 
-    public User createUser(UserDto userDto, MultipartFile file){
-        userRepository.findByEmail(userDto.getEmail()).ifPresent(value -> {
-            throw new AlreadyExistsExeption("email", value.getEmail());
+    public User createUser(UserDto userDto, MultipartFile file) {
+        userRepository.findByEmail(userDto.getEmail()).ifPresent(existingUser -> {
+            throw new AlreadyExistsExeption("email", existingUser.getEmail());
         });
-        if ((file != null)) {
-            userDto.setPicture(file.getOriginalFilename());
-        } else {
-            userDto.setPicture(null);
-        }
-        User user = this.userMapper.mapFromRest(userDto);
+
+        User user = userMapper.mapFromRest(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(file != null) user.setPicture(this.storageService.save(file));
-        switch (user.getRole()){
-            case SUPERADMIN : {
-                SuperAdmin superAdmin = this.userMapper.userToSuperadmin(user);
-                this.superadminRepository.save(superAdmin);
-                return superAdmin;
-            }
-            case ADMIN : {
-                Admin admin = this.userMapper.userToAdmin(user);
-                this.adminRepository.save(admin);
-                return admin;
-            }
-            case CLIENT : {
-                throw new NotAuthorized("Clients could be created only by admins");
-            }
+
+        if (file != null && file.getSize() > 0) {
+            user.setPicture(storageService.save(file));
         }
-        return user;
+
+        switch (user.getRole()) {
+            case SUPERADMIN:
+                SuperAdmin superAdmin = userMapper.userToSuperadmin(user);
+                superadminRepository.save(superAdmin);
+                return superAdmin;
+
+            case ADMIN:
+                Admin admin = userMapper.userToAdmin(user);
+                return adminRepository.save(admin);
+
+            case CLIENT:
+                throw new NotAuthorized("Clients can only be created by admins");
+
+            default:
+                throw new IllegalArgumentException("Unknown role: " + user.getRole());
+        }
     }
-    public User updateUser(Long id , UserDto request, MultipartFile file){
+
+        public User updateUser(Long id , UserDto request, MultipartFile file){
         User user = this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("user", id));
-        if(file != null){
+        if((file != null) && (file.getSize() > 0)){
             request.setPicture(this.storageService.save(file));
         }
         request.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -175,7 +176,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         String userSQL = "INSERT INTO mytodo.\"user\" (id, uuid, creationDate, lastUpdate, firstname, lastname, password, email, role, picture) " +
-                "SELECT 1000, '214ee728-9102-4486-8519-5845629b934e', NOW(), NOW(), 'Amir', 'Boussaffara', ?, 'argus@system.com', 'SUPERADMIN', 'admin.jpg' " +
+                "SELECT 1000, '214ee728-9102-4486-8519-5845629b934e', NOW(), NOW(), 'Amir', 'Boussaffara', ?, 'argus@system.com', 'SUPERADMIN', NULL " +
                 "WHERE NOT EXISTS (SELECT 1 FROM mytodo.\"user\" WHERE id = 1000 OR email = 'argus@system.com')";
         String superAdminSQL = "INSERT INTO mytodo.\"superadmin\" (id) " +
                 "SELECT 1000 "+

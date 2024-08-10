@@ -3,6 +3,7 @@ package com.argus.mytodo.entities.dtos;
 
 import com.argus.mytodo.Enums.RoleENUM;
 import com.argus.mytodo.entities.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.UUID;
@@ -13,6 +14,7 @@ public class UserDto extends BaseEntity {
     private UUID uuid;
     private String firstname;
     private String lastname;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String email;
     private String picture;
