@@ -17,6 +17,10 @@ public class RoleEndpoints {
             // Add other ADMIN endpoints here
     );
 
+    public static final List<String> COMMON_ENDPOINTS = List.of(
+            // Add other commun endpoints between ADMIN and SUPERADMIN here
+    );
+
     public static final List<String> CLIENT_ENDPOINTS = List.of(
             // Add other CLIENT endpoints here
     );

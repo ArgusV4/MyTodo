@@ -40,6 +40,8 @@ public class SecurityConfig{
                 .authorizeHttpRequests(auth -> {
                     RoleEndpoints.WhiteList_ENDPOINTS.forEach(endpoint ->
                             auth.requestMatchers(endpoint).permitAll());
+                    RoleEndpoints.COMMON_ENDPOINTS.forEach(endpoint ->
+                            auth.requestMatchers(endpoint).hasAnyAuthority("ROLE_SUPERADMIN","ROLE_ADMIN"));
                     RoleEndpoints.SUPERADMIN_ENDPOINTS.forEach(endpoint ->
                             auth.requestMatchers(endpoint).hasAuthority("ROLE_SUPERADMIN"));
                     RoleEndpoints.ADMIN_ENDPOINTS.forEach(endpoint ->
