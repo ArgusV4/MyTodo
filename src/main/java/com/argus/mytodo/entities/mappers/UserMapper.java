@@ -44,6 +44,7 @@ public class UserMapper {
         if (adminDto.getFirstname() != null) admin.setFirstname(adminDto.getFirstname());
         if (adminDto.getLastname() != null) admin.setLastname(adminDto.getLastname());
         if (adminDto.getEmail() != null) admin.setEmail(adminDto.getEmail());
+        if (adminDto.getPassword() != null) admin.setPassword(adminDto.getPassword());
         if (adminDto.getPicture() != null) admin.setPicture(adminDto.getPicture());
         if (adminDto.getRole() != null) admin.setRole(adminDto.getRole());
 
@@ -57,6 +58,7 @@ public class UserMapper {
         if (clientDto.getFirstname() != null) client.setFirstname(clientDto.getFirstname());
         if (clientDto.getLastname() != null) client.setLastname(clientDto.getLastname());
         if (clientDto.getEmail() != null) client.setEmail(clientDto.getEmail());
+        if (clientDto.getPassword() != null) client.setPassword(clientDto.getPassword());
         if (clientDto.getPicture() != null) client.setPicture(clientDto.getPicture());
         if (clientDto.getRole() != null) client.setRole(clientDto.getRole());
         if (clientDto.getUuidAdmin() != null) client.setUuidAdmin(clientDto.getUuidAdmin());
@@ -110,6 +112,8 @@ public class UserMapper {
         userDto.setPassword(user.getPassword());
         userDto.setPicture(user.getPicture());
         userDto.setRole(user.getRole());
+        userDto.setCreationDate(user.getCreationDate());
+        userDto.setLastUpdate(user.getLastUpdate());
         return userDto;
     }
     public SuperadminDto mapToRest(SuperAdmin superAdmin) {
@@ -122,6 +126,8 @@ public class UserMapper {
         superadminDto.setPassword(superAdmin.getPassword());
         superadminDto.setPicture(superAdmin.getPicture());
         superadminDto.setRole(superAdmin.getRole());
+        superadminDto.setCreationDate(superAdmin.getCreationDate());
+        superadminDto.setLastUpdate(superAdmin.getLastUpdate());
         return superadminDto;
     }
     public AdminDto mapToRest(Admin admin) {
@@ -131,8 +137,11 @@ public class UserMapper {
         adminDto.setFirstname(admin.getFirstname());
         adminDto.setLastname(admin.getLastname());
         adminDto.setEmail(admin.getEmail());
+        adminDto.setPassword(admin.getPassword());
         adminDto.setPicture(admin.getPicture());
         adminDto.setRole(admin.getRole());
+        adminDto.setCreationDate(admin.getCreationDate());
+        adminDto.setLastUpdate(admin.getLastUpdate());
         return adminDto;
     }
     public ClientDto mapToRest(Client client) {
@@ -142,9 +151,12 @@ public class UserMapper {
         clientDto.setFirstname(client.getFirstname());
         clientDto.setLastname(client.getLastname());
         clientDto.setEmail(client.getEmail());
+        clientDto.setPassword(client.getPassword());
         clientDto.setPicture(client.getPicture());
         clientDto.setRole(client.getRole());
         clientDto.setUuidAdmin(client.getUuidAdmin());
+        clientDto.setCreationDate(client.getCreationDate());
+        clientDto.setLastUpdate(client.getLastUpdate());
         return clientDto;
     }
     public User update(User user, UserDto userDto) {
