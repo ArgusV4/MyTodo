@@ -6,7 +6,7 @@ public class RoleEndpoints {
     public static final List<String> SUPERADMIN_ENDPOINTS = List.of(
             "/users/create",
             "/users/all-users",
-            "/users/user/{id}"
+            "/users/user/\\d+"
             // Add other SUPERADMIN endpoints here
     );
 
@@ -15,10 +15,6 @@ public class RoleEndpoints {
             "/todos/create",
             "/todos/getTodoByAdmin"
             // Add other ADMIN endpoints here
-    );
-
-    public static final List<String> COMMON_ENDPOINTS = List.of(
-            // Add other commun endpoints between ADMIN and SUPERADMIN here
     );
 
     public static final List<String> CLIENT_ENDPOINTS = List.of(
