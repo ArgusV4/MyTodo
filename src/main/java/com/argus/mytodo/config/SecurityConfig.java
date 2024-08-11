@@ -19,6 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Configuration
 @EnableWebSecurity
@@ -37,19 +40,7 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> {
-                    RoleEndpoints.WhiteList_ENDPOINTS.forEach(endpoint ->
-                            auth.requestMatchers(endpoint).permitAll());
-                    RoleEndpoints.COMMON_ENDPOINTS.forEach(endpoint ->
-                            auth.requestMatchers(endpoint).hasAnyAuthority("ROLE_SUPERADMIN","ROLE_ADMIN"));
-                    RoleEndpoints.SUPERADMIN_ENDPOINTS.forEach(endpoint ->
-                            auth.requestMatchers(endpoint).hasAuthority("ROLE_SUPERADMIN"));
-                    RoleEndpoints.ADMIN_ENDPOINTS.forEach(endpoint ->
-                            auth.requestMatchers(endpoint).hasAuthority("ROLE_ADMIN"));
-                    RoleEndpoints.CLIENT_ENDPOINTS.forEach(endpoint ->
-                            auth.requestMatchers(endpoint).hasAuthority("ROLE_CLIENT"));
-                    auth.anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)

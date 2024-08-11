@@ -18,15 +18,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 
 
-// This class helps us to validate the generated jwt token
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -87,30 +83,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean hasAccess(UserDetails userDetails, String requestURI) {
-        // Extract user roles/authorities
         Set<String> userAuthorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
-        // Check if the URI is in the whitelist
-        if (RoleEndpoints.WhiteList_ENDPOINTS.stream().anyMatch(requestURI::matches)) {
-            return true;
-        }
-
-        // Check if the URI is a common endpoint accessible by multiple roles
-        if (RoleEndpoints.COMMON_ENDPOINTS.stream().anyMatch(requestURI::matches)) {
-            // Define common roles allowed to access common endpoints
-            Set<String> commonRoles = Set.of("ROLE_SUPERADMIN", "ROLE_ADMIN"); // Adjust roles as needed
-            return userAuthorities.stream().anyMatch(commonRoles::contains);
-        }
-
-        // Define authority-role mappings for specific endpoints
         Map<String, List<String>> authorityToEndpoints = new HashMap<>();
         authorityToEndpoints.put("ROLE_SUPERADMIN", RoleEndpoints.SUPERADMIN_ENDPOINTS);
         authorityToEndpoints.put("ROLE_ADMIN", RoleEndpoints.ADMIN_ENDPOINTS);
         authorityToEndpoints.put("ROLE_CLIENT", RoleEndpoints.CLIENT_ENDPOINTS);
 
-        // Check if the user has access to the requested URI based on their roles
         for (String authority : userAuthorities) {
             List<String> endpoints = authorityToEndpoints.get(authority);
             if (endpoints != null && endpoints.stream().anyMatch(requestURI::matches)) {
@@ -118,10 +99,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        // If none of the roles have access to the requested URI, deny access
-        return false;
+        return anyOtherRequest(requestURI);
     }
-    //convert response to exception
+
+    private boolean anyOtherRequest(String requestURI){
+        List<String> availableEndpoints = new ArrayList<>();
+        availableEndpoints.addAll(RoleEndpoints.WhiteList_ENDPOINTS);
+        availableEndpoints.addAll(RoleEndpoints.SUPERADMIN_ENDPOINTS);
+        availableEndpoints.addAll(RoleEndpoints.ADMIN_ENDPOINTS);
+        availableEndpoints.addAll(RoleEndpoints.CLIENT_ENDPOINTS);
+
+        return !availableEndpoints.stream().anyMatch(requestURI::matches);
+    }
     private void exception(HttpServletResponse response, String message) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), message);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
