@@ -1,17 +1,20 @@
 package com.argus.mytodo.entities.mappers;
 
-import com.argus.mytodo.entities.Admin;
-import com.argus.mytodo.entities.Client;
-import com.argus.mytodo.entities.SuperAdmin;
-import com.argus.mytodo.entities.User;
-import com.argus.mytodo.entities.dtos.AdminDto;
-import com.argus.mytodo.entities.dtos.ClientDto;
-import com.argus.mytodo.entities.dtos.SuperadminDto;
-import com.argus.mytodo.entities.dtos.UserDto;
+import com.argus.mytodo.entities.*;
+import com.argus.mytodo.entities.dtos.*;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
+
+    private final AuthorityMapper authorityMapper;
+    public UserMapper(AuthorityMapper authorityMapper) {
+        this.authorityMapper = authorityMapper;
+    }
+
     public User mapFromRest(UserDto userDto) {
         User user = new User();
         if (userDto.getId() != null) user.setId(userDto.getId());
@@ -22,6 +25,12 @@ public class UserMapper {
         if (userDto.getPassword() != null) user.setPassword(userDto.getPassword());
         if (userDto.getPicture() != null) user.setPicture(userDto.getPicture());
         if (userDto.getRole() != null) user.setRole(userDto.getRole());
+        if (userDto.getAuthorities() != null) {
+            List<Authority> authorities = userDto.getAuthorities().stream()
+                    .map(this.authorityMapper::mapFromRest)
+                    .collect(Collectors.toList());
+            user.setAuthorities(authorities);
+        }
         return user;
     }
 
@@ -35,6 +44,12 @@ public class UserMapper {
         if (superadminDto.getPassword() != null) superadminDto.setPassword(superadminDto.getPassword());
         if (superadminDto.getPicture() != null) superadminDto.setPicture(superadminDto.getPicture());
         if (superadminDto.getRole() != null) superadminDto.setRole(superadminDto.getRole());
+        if (superadminDto.getAuthorities() != null) {
+            List<Authority> authorities = superadminDto.getAuthorities().stream()
+                    .map(this.authorityMapper::mapFromRest)
+                    .collect(Collectors.toList());
+            superAdmin.setAuthorities(authorities);
+        }
         return superAdmin;
     }
     public Admin mapFromRest(AdminDto adminDto) {
@@ -47,8 +62,12 @@ public class UserMapper {
         if (adminDto.getPassword() != null) admin.setPassword(adminDto.getPassword());
         if (adminDto.getPicture() != null) admin.setPicture(adminDto.getPicture());
         if (adminDto.getRole() != null) admin.setRole(adminDto.getRole());
-
-
+        if (adminDto.getAuthorities() != null) {
+            List<Authority> authorities = adminDto.getAuthorities().stream()
+                    .map(this.authorityMapper::mapFromRest)
+                    .collect(Collectors.toList());
+            admin.setAuthorities(authorities);
+        }
         return admin;
     }
     public Client mapFromRest(ClientDto clientDto) {
@@ -62,6 +81,12 @@ public class UserMapper {
         if (clientDto.getPicture() != null) client.setPicture(clientDto.getPicture());
         if (clientDto.getRole() != null) client.setRole(clientDto.getRole());
         if (clientDto.getUuidAdmin() != null) client.setUuidAdmin(clientDto.getUuidAdmin());
+        if (clientDto.getAuthorities() != null) {
+            List<Authority> authorities = clientDto.getAuthorities().stream()
+                    .map(this.authorityMapper::mapFromRest)
+                    .collect(Collectors.toList());
+            client.setAuthorities(authorities);
+        }
         return client;
     }
 
@@ -75,6 +100,7 @@ public class UserMapper {
         if (user.getPassword() != null) superAdmin.setPassword(user.getPassword());
         if (user.getPicture() != null) superAdmin.setPicture(user.getPicture());
         if (user.getRole() != null) superAdmin.setRole(user.getRole());
+        if (user.getAuthorities() != null) superAdmin.setAuthorities(user.getAuthorities());
         return superAdmin;
     }
     public Admin userToAdmin(User user) {
@@ -87,6 +113,7 @@ public class UserMapper {
         if (user.getPassword() != null) admin.setPassword(user.getPassword());
         if (user.getPicture() != null) admin.setPicture(user.getPicture());
         if (user.getRole() != null) admin.setRole(user.getRole());
+        if (user.getAuthorities() != null) admin.setAuthorities(user.getAuthorities());
         return admin;
     }
     public Client userToClient(User user) {
@@ -99,6 +126,7 @@ public class UserMapper {
         if (user.getPassword() != null) client.setPassword(user.getPassword());
         if (user.getPicture() != null) client.setPicture(user.getPicture());
         if (user.getRole() != null) client.setRole(user.getRole());
+        if (user.getAuthorities() != null) client.setAuthorities(user.getAuthorities());
         return client;
     }
 
@@ -114,6 +142,10 @@ public class UserMapper {
         userDto.setRole(user.getRole());
         userDto.setCreationDate(user.getCreationDate());
         userDto.setLastUpdate(user.getLastUpdate());
+        List<AuthorityDto> authoritiesDto = user.getAuthorities().stream()
+                .map(this.authorityMapper::mapTorest)
+                .collect(Collectors.toList());
+        userDto.setAuthorities(authoritiesDto);
         return userDto;
     }
     public SuperadminDto mapToRest(SuperAdmin superAdmin) {
@@ -128,6 +160,10 @@ public class UserMapper {
         superadminDto.setRole(superAdmin.getRole());
         superadminDto.setCreationDate(superAdmin.getCreationDate());
         superadminDto.setLastUpdate(superAdmin.getLastUpdate());
+        List<AuthorityDto> authoritiesDto = superAdmin.getAuthorities().stream()
+                .map(this.authorityMapper::mapTorest)
+                .collect(Collectors.toList());
+        superadminDto.setAuthorities(authoritiesDto);
         return superadminDto;
     }
     public AdminDto mapToRest(Admin admin) {
@@ -142,6 +178,10 @@ public class UserMapper {
         adminDto.setRole(admin.getRole());
         adminDto.setCreationDate(admin.getCreationDate());
         adminDto.setLastUpdate(admin.getLastUpdate());
+        List<AuthorityDto> authoritiesDto = admin.getAuthorities().stream()
+                .map(this.authorityMapper::mapTorest)
+                .collect(Collectors.toList());
+        adminDto.setAuthorities(authoritiesDto);
         return adminDto;
     }
     public ClientDto mapToRest(Client client) {
@@ -157,6 +197,10 @@ public class UserMapper {
         clientDto.setUuidAdmin(client.getUuidAdmin());
         clientDto.setCreationDate(client.getCreationDate());
         clientDto.setLastUpdate(client.getLastUpdate());
+        List<AuthorityDto> authoritiesDto = client.getAuthorities().stream()
+                .map(this.authorityMapper::mapTorest)
+                .collect(Collectors.toList());
+        clientDto.setAuthorities(authoritiesDto);
         return clientDto;
     }
     public User update(User user, UserDto userDto) {
@@ -166,6 +210,12 @@ public class UserMapper {
         if (userDto.getPassword() != null) user.setPassword(userDto.getPassword());
         if (userDto.getPicture() != null) user.setPicture(userDto.getPicture());
         if (userDto.getRole() != null) user.setRole(userDto.getRole());
+        if (userDto.getAuthorities() != null) {
+            List<Authority> authorities = userDto.getAuthorities().stream()
+                    .map(this.authorityMapper::mapFromRest)
+                    .collect(Collectors.toList());
+            user.setAuthorities(authorities);
+        }
         return user;
     }
 }

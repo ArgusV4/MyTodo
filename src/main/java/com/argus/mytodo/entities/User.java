@@ -4,6 +4,8 @@ import com.argus.mytodo.Enums.RoleENUM;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 @Entity
@@ -19,6 +21,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private RoleENUM role;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Authority> authorities;
 }
 
 
