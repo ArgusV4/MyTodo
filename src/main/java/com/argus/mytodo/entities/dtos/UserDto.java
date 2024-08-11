@@ -6,6 +6,7 @@ import com.argus.mytodo.entities.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -19,4 +20,5 @@ public class UserDto extends BaseEntity {
     private String email;
     private String picture;
     private RoleENUM role;
+    private List<AuthorityDto> authorities;
 }

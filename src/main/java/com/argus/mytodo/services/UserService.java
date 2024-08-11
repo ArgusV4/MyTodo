@@ -1,10 +1,7 @@
 package com.argus.mytodo.services;
 
 import com.argus.mytodo.Enums.RoleENUM;
-import com.argus.mytodo.entities.Admin;
-import com.argus.mytodo.entities.Client;
-import com.argus.mytodo.entities.SuperAdmin;
-import com.argus.mytodo.entities.User;
+import com.argus.mytodo.entities.*;
 import com.argus.mytodo.entities.dtos.ClientDto;
 import com.argus.mytodo.entities.dtos.UserDto;
 import com.argus.mytodo.entities.mappers.UserMapper;
@@ -14,12 +11,7 @@ import com.argus.mytodo.exceptionhandler.NotFoundException;
 import com.argus.mytodo.jwt.AuthRequest;
 import com.argus.mytodo.jwt.AuthResponse;
 import com.argus.mytodo.jwt.JwtService;
-import com.argus.mytodo.repositories.AdminRepository;
-import com.argus.mytodo.repositories.ClientRepository;
-import com.argus.mytodo.repositories.SuperadminRepository;
-import com.argus.mytodo.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.argus.mytodo.repositories.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,10 +39,11 @@ public class UserService {
     private final JdbcTemplate jdbcTemplate;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final AuthorityRepository authorityRepository;
 
 
 
-    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate,AuthenticationManager authenticationManager , JwtService jwtService ) {
+    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate,AuthenticationManager authenticationManager , JwtService jwtService, AuthorityRepository authorityRepository ) {
         this.storageService = storageService;
         this.userMapper = userMapper;
         this.userRepository = userRepository;
@@ -61,7 +54,7 @@ public class UserService {
         this.jdbcTemplate = jdbcTemplate;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-
+        this.authorityRepository = authorityRepository;
 
     }
 
@@ -115,12 +108,21 @@ public class UserService {
         switch (user.getRole()) {
             case SUPERADMIN:
                 SuperAdmin superAdmin = userMapper.userToSuperadmin(user);
-                superadminRepository.save(superAdmin);
+                superAdmin = superadminRepository.save(superAdmin);
+                Authority superadminAuthority = new Authority();
+                superadminAuthority.setName(RoleENUM.SUPERADMIN);
+                superadminAuthority.setUser(superAdmin);
+                this.authorityRepository.save(superadminAuthority);
                 return superAdmin;
 
             case ADMIN:
                 Admin admin = userMapper.userToAdmin(user);
-                return adminRepository.save(admin);
+                admin = adminRepository.save(admin);
+                Authority adminAuthority = new Authority();
+                adminAuthority.setName(RoleENUM.ADMIN);
+                adminAuthority.setUser(admin);
+                this.authorityRepository.save(adminAuthority);
+                return admin;
 
             case CLIENT:
                 throw new NotAuthorized("Clients can only be created by admins");
@@ -175,14 +177,28 @@ public class UserService {
         String rawPassword = "system1199";
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
-        String userSQL = "INSERT INTO mytodo.\"user\" (id, uuid, creationDate, lastUpdate, firstname, lastname, password, email, role, picture) " +
-                "SELECT 1000, '214ee728-9102-4486-8519-5845629b934e', NOW(), NOW(), 'Amir', 'Boussaffara', ?, 'argus@system.com', 'SUPERADMIN', NULL " +
-                "WHERE NOT EXISTS (SELECT 1 FROM mytodo.\"user\" WHERE id = 1000 OR email = 'argus@system.com')";
-        String superAdminSQL = "INSERT INTO mytodo.\"superadmin\" (id) " +
-                "SELECT 1000 "+
-                "WHERE NOT EXISTS (SELECT 1 FROM mytodo.\"superadmin\" WHERE id = 1000)";
+        // Check if the user already exists
+        String userCheckSQL = "SELECT COUNT(*) FROM mytodo.\"user\" WHERE email = 'argus@system.com'";
+        Integer userCount = jdbcTemplate.queryForObject(userCheckSQL, Integer.class);
 
-        jdbcTemplate.update(userSQL, encodedPassword);
-        jdbcTemplate.update(superAdminSQL);
+        if (userCount == null || userCount == 0) {
+            // Insert the user
+            String userSQL = "INSERT INTO mytodo.\"user\" (id, uuid, creationDate, lastUpdate, firstname, lastname, password, email, role, picture) " +
+                    "VALUES (1000, '214ee728-9102-4486-8519-5845629b934e', NOW(), NOW(), 'Amir', 'Boussaffara', ?, 'argus@system.com', 'SUPERADMIN', NULL)";
+            jdbcTemplate.update(userSQL, encodedPassword);
+
+            // Insert authorities with UUIDs and timestamps
+            String authoritySQL = "INSERT INTO mytodo.\"authority\" (id, uuid, creationDate, lastUpdate, name, user_id) " +
+                    "VALUES (1, '2182d0f9-935f-4c9f-9c22-860f37a98f58', NOW(), NOW(), 'SUPERADMIN', 1000), " +
+                    "(2, '7c9e6d5a-d7f5-4e26-aa95-8a01fa12cbf7', NOW(), NOW(), 'ADMIN', 1000), " +
+                    "(3, '23bad62f-28ec-4def-a728-e7bf46492bc7', NOW(), NOW(), 'CLIENT', 1000)";
+            jdbcTemplate.update(authoritySQL);
+
+            // Insert superadmin record
+            String superAdminSQL = "INSERT INTO mytodo.\"superadmin\" (id) " +
+                    "SELECT 1000 " +
+                    "WHERE NOT EXISTS (SELECT 1 FROM mytodo.\"superadmin\" WHERE id = 1000)";
+            jdbcTemplate.update(superAdminSQL);
+        }
     }
 }
