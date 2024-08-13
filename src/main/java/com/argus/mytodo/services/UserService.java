@@ -1,6 +1,5 @@
 package com.argus.mytodo.services;
 
-import com.argus.mytodo.Enums.RoleENUM;
 import com.argus.mytodo.entities.Admin;
 import com.argus.mytodo.entities.Client;
 import com.argus.mytodo.entities.SuperAdmin;
@@ -21,8 +20,6 @@ import com.argus.mytodo.repositories.UserRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -204,7 +201,4 @@ public class UserService {
         jdbcTemplate.update(superAdminSQL);
     }
 
-    public User createNewUser(User user) {
-        return this.userRepository.save(user);
-    }
 }

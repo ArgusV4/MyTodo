@@ -11,9 +11,7 @@ import com.argus.mytodo.services.FilesStorageService;
 import com.argus.mytodo.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.argus.mytodo.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -84,12 +82,6 @@ public class UserController {
     @GetMapping("/principal")
     public Principal user(Principal principal) {
         return principal;
-    }
-
-    @PostMapping("create-new-user")
-    public ResponseEntity<UserDto> createNewUser(@RequestBody @Valid UserDto userDto){
-        User user = this.userMapper.mapFromRest(userDto);
-        return ResponseEntity.ok(this.userMapper.mapToRest(this.userService.createNewUser(user)));
     }
 
 }
