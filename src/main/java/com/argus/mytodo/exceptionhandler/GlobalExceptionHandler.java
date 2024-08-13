@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         String errorMessage = ex.getConstraintViolations()
                 .stream()
                 .map(violation -> violation.getMessage())
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(". "));
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
