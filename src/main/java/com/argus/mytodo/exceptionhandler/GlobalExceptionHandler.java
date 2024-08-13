@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
                 .getAllErrors()
                 .stream()
                 .map(error -> error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(" "));
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -73,8 +73,8 @@ public class GlobalExceptionHandler {
         String errorMessage = ex.getConstraintViolations()
                 .stream()
                 .map(violation -> violation.getMessage())
-                .collect(Collectors.joining(". "));
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage + ".");
+                .collect(Collectors.joining(" "));
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 

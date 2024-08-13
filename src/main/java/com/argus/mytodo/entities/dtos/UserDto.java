@@ -18,13 +18,13 @@ public class UserDto extends BaseEntity {
     private Long id;
     private UUID uuid;
 
-    @NotBlank(message = "Firstname is required")
+    @NotBlank(message = "Firstname is required.")
     private String firstname;
 
-    @NotBlank(message = "Lastname is required")
+    @NotBlank(message = "Lastname is required.")
     private String lastname;
 
-    @Email(message = "Email should be valid")
+    @Email(message = "Email should be valid.")
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
