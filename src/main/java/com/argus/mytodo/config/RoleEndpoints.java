@@ -21,7 +21,8 @@ public class RoleEndpoints {
             // Add other CLIENT endpoints here
     );
     public static final List<String> WhiteList_ENDPOINTS = List.of(
-            "/users/generateToken"
+            "/users/generateToken",
+            "/users/create-new-user"
             // Add other WhiteList endpoints here
     );
 }

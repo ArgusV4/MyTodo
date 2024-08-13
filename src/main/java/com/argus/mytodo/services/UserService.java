@@ -18,6 +18,9 @@ import com.argus.mytodo.repositories.AdminRepository;
 import com.argus.mytodo.repositories.ClientRepository;
 import com.argus.mytodo.repositories.SuperadminRepository;
 import com.argus.mytodo.repositories.UserRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.Set;
 
 
 @Service
@@ -47,10 +50,10 @@ public class UserService {
     private final JdbcTemplate jdbcTemplate;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final Validator validator;
 
 
-
-    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate,AuthenticationManager authenticationManager , JwtService jwtService ) {
+    public UserService(FilesStorageService storageService, UserMapper userMapper, UserRepository userRepository, SuperadminRepository superadminRepository, AdminRepository adminRepository, ClientRepository clientRepository, PasswordEncoder passwordEncoder, JdbcTemplate jdbcTemplate,AuthenticationManager authenticationManager , JwtService jwtService, Validator validator) {
         this.storageService = storageService;
         this.userMapper = userMapper;
         this.userRepository = userRepository;
@@ -61,7 +64,7 @@ public class UserService {
         this.jdbcTemplate = jdbcTemplate;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-
+        this.validator = validator;
 
     }
 
@@ -84,6 +87,7 @@ public class UserService {
         userRepository.findByEmail(clientDto.getEmail()).ifPresent(value -> {
             throw new AlreadyExistsExeption("email", value.getEmail());
         });
+        this.userValidation(clientDto);
         User admin = this.jwtService.extractUserFromToken(token).get();
         clientDto.setUuidAdmin(admin.getUuid());
         if ((file != null)) {
@@ -104,6 +108,8 @@ public class UserService {
         userRepository.findByEmail(userDto.getEmail()).ifPresent(existingUser -> {
             throw new AlreadyExistsExeption("email", existingUser.getEmail());
         });
+
+        this.userValidation(userDto);
 
         User user = userMapper.mapFromRest(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -132,6 +138,7 @@ public class UserService {
 
         public User updateUser(Long id , UserDto request, MultipartFile file){
         User user = this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("user", id));
+        this.userValidation(request);
         if((file != null) && (file.getSize() > 0)){
             request.setPicture(this.storageService.save(file));
         }
@@ -170,6 +177,17 @@ public class UserService {
         }
     }
 
+    private void userValidation(UserDto user){
+        Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<UserDto> violation : violations) {
+                sb.append(violation.getMessage()).append("\n");
+            }
+            throw new ConstraintViolationException(sb.toString(), violations);
+        }
+    }
+
 
     public void createSuperAdminIfNotExists() {
         String rawPassword = "system1199";
@@ -184,5 +202,9 @@ public class UserService {
 
         jdbcTemplate.update(userSQL, encodedPassword);
         jdbcTemplate.update(superAdminSQL);
+    }
+
+    public User createNewUser(User user) {
+        return this.userRepository.save(user);
     }
 }
