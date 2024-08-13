@@ -11,17 +11,12 @@ import com.argus.mytodo.services.FilesStorageService;
 import com.argus.mytodo.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.argus.mytodo.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Principal;
 import java.util.List;
@@ -88,7 +83,6 @@ public class UserController {
     public Principal user(Principal principal) {
         return principal;
     }
-
 
 }
 

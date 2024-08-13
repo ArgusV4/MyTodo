@@ -2,6 +2,7 @@ package com.argus.mytodo.config;
 
 import com.argus.mytodo.jwt.JwtAuthFilter;
 import com.argus.mytodo.jwt.UserInfoService;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,11 @@ public class SecurityConfig{
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public Validator validator() {
+        return new LocalValidatorFactoryBean();
     }
 
 
