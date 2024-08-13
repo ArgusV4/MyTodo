@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(violation -> violation.getMessage())
                 .collect(Collectors.joining(". "));
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessage + ".");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
