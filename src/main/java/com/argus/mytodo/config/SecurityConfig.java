@@ -2,6 +2,10 @@ package com.argus.mytodo.config;
 
 import com.argus.mytodo.jwt.JwtAuthFilter;
 import com.argus.mytodo.jwt.UserInfoService;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -71,6 +75,21 @@ public class SecurityConfig {
     @Bean
     public Validator validator() {
         return new LocalValidatorFactoryBean();
+    }
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .name("bearerAuth")
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
+                )
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 
 
