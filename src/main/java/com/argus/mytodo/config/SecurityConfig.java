@@ -28,7 +28,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig{
+public class  SecurityConfig{
 
     @Autowired
     private JwtAuthFilter authFilter;
