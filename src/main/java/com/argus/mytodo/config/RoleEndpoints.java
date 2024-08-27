@@ -21,7 +21,9 @@ public class RoleEndpoints {
             // Add other CLIENT endpoints here
     );
     public static final List<String> WhiteList_ENDPOINTS = List.of(
-            "/users/generateToken"
+            "/users/generateToken",
+            "/swagger-ui.*",
+            "/v3/api-docs.*"
             // Add other WhiteList endpoints here
     );
 }
