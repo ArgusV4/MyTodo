@@ -1,5 +1,6 @@
 package com.argus.mytodo.controllers;
 
+import com.argus.mytodo.advices.annotations.TrackExecutionTime;
 import com.argus.mytodo.entities.Client;
 import com.argus.mytodo.entities.dtos.ClientDto;
 import com.argus.mytodo.jwt.AuthRequest;
@@ -74,9 +75,10 @@ public class UserController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
+    @TrackExecutionTime
     @PostMapping("/generateToken")
-    public AuthResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        return this.userService.generateToken(authRequest);
+    public ResponseEntity<AuthResponse> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+        return ResponseEntity.ok().body(this.userService.generateToken(authRequest));
     }
 
     @GetMapping("/principal")
