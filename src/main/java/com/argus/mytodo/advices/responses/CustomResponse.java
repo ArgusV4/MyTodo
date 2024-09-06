@@ -1,4 +1,4 @@
-package com.argus.mytodo.advices.annotations.responses;
+package com.argus.mytodo.advices.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

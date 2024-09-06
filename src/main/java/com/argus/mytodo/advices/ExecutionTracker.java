@@ -1,6 +1,6 @@
 package com.argus.mytodo.advices;
 
-import com.argus.mytodo.advices.annotations.responses.CustomResponse;
+import com.argus.mytodo.advices.responses.CustomResponse;
 import com.argus.mytodo.exceptionhandler.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
