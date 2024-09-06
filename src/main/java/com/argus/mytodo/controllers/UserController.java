@@ -75,7 +75,6 @@ public class UserController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
-    @TrackExecutionTime
     @PostMapping("/generateToken")
     public ResponseEntity<AuthResponse> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         return ResponseEntity.ok().body(this.userService.generateToken(authRequest));
